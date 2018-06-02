@@ -1,0 +1,275 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define NAME_LENGTH 40
+
+typedef struct game
+{
+    char name1[NAME_LENGTH]; // name of team 1
+    char name2[NAME_LENGTH];// name of team 2
+    int goals1;   // goals scored  by team 1
+    int goals2;  // goals scored by team 2
+} GAME;
+
+typedef struct game_node
+{
+    GAME agame;
+    struct game_node *next;
+} GAME_NODE;
+
+typedef struct game_list
+{
+    struct game_node *head, *tail;
+} GAME_LIST;
+
+typedef struct team
+{
+    char name[NAME_LENGTH];
+    int games_played;
+    int wins;
+    int draws;
+    int losses;
+    GAME_LIST games;
+} TEAM;
+
+GAME* ReadGames(int *pngames);
+TEAM* FillTable(int *pnum_teams, GAME all_games[], int num_games);
+TEAM* PrepareTable(int** tsize, GAME allgames[], int num_games);
+
+GAME ReadGame();
+int findIfNameExist (TEAM allteams[], const char* name, int size);
+TEAM* FillTeamsNames(TEAM* table[], int *pnum_teams, GAME* allgames[], int num_games);
+TEAM* addGameLists(TEAM* table[], int num_teams, GAME* allgames[], int num_games);
+TEAM* fillRestOfTableTypes(TEAM* table[], int num_teams);
+
+
+/////// ***** MAIN ***** ///////
+
+void main()
+{
+    GAME* all_games = NULL;
+    TEAM* table = NULL;
+    int num_games = 0, num_teams = 0;
+
+    all_games = ReadGames(&num_games);
+    table  = FillTable(&num_teams, all_games, num_games);
+
+    printf("\n%d", table[0].wins);
+    printf("\n%d", table[1].wins);
+
+//    PrintTable(table, num_teams);
+//    FreeAllGames(all_games, num_games);
+//    FreeAllTeams(table, num_teams);
+
+}
+
+    ////////////////////////////// ********* functions assigned to structs ********* //////////////////////////////
+
+GAME* ReadGames(int *pngames)
+{
+    char choice = 'y';
+    GAME* all_games = NULL;
+    GAME game;
+
+    while (choice != 'n')
+    {
+        printf("\nWould you like to add another game? (y/n) ");
+        scanf(" %c", &choice);
+
+        if (choice == 'y')
+        {
+            game = ReadGame();
+            all_games = (GAME*)realloc(all_games, (*pngames + 1) * sizeof(GAME));
+            all_games[*pngames] = game;
+            (*pngames)++;
+        }
+        else if (choice != 'y' && choice != 'n')
+        {
+            printf("Wrong input.\n");
+        }
+    } //while
+
+    return all_games;
+
+}
+
+
+TEAM* FillTable(int *pnum_teams, GAME all_games[], int num_games)
+{
+    TEAM* table = NULL;
+    table = PrepareTable(&pnum_teams, all_games, num_games);
+
+}
+
+TEAM* PrepareTable(int** tsize, GAME allgames[], int num_games)
+{
+    int num_team = **tsize;
+
+    TEAM* table = NULL;
+    table = FillTeamsNames(&table, &num_team, &allgames, num_games);
+    table = addGameLists(&table, num_team, &allgames, num_games);
+    table = fillRestOfTableTypes(&table, num_team);
+
+    return table;
+
+
+
+
+
+}
+
+
+
+
+    ////////////////////////////// ********* assistance functions ********* //////////////////////////////
+
+GAME ReadGame()
+{
+    GAME game;
+
+    printf("Please enter first team: ");
+    getchar();
+    fgets(game.name1, NAME_LENGTH, stdin);
+    printf("Please enter first team's goals: ");
+    scanf("%d", &game.goals1);
+    printf("Please enter second team: ");
+    getchar();
+    fgets(game.name2, NAME_LENGTH, stdin);
+    printf("Please enter second team's goals: ");
+    scanf("%d", &game.goals2);
+
+    return game;
+}
+
+int findIfNameExist (TEAM all_teams[], const char *name, int size)
+{
+    int exist = 0;
+    for (int i = 0; i < size; ++i) {
+        exist = strcmp(all_teams[i].name, name);
+    }
+        return exist;
+}
+
+TEAM* FillTeamsNames(TEAM **table, int *pnum_teams, GAME **allgames, int num_games)
+{
+    int nameExist = 1;
+
+    *table = (TEAM*)malloc(1 * sizeof(TEAM));
+    strcpy(table[*pnum_teams]->name, allgames[0]->name1);
+    ++*pnum_teams;
+
+    // check every team if name already exist, increment game count every iteration.
+    for (int gamesCount = 0; gamesCount < num_games; gamesCount++)
+    {
+        puts(allgames[gamesCount]->name2);
+        puts(table[*pnum_teams-1]->name);
+
+        // finds first name in allgames array is already exists in table
+        nameExist = findIfNameExist(*table, allgames[gamesCount]->name1, *pnum_teams);
+        if (nameExist != 0)
+        {
+            *table = (TEAM*)realloc(*table, *pnum_teams + 1 * sizeof(TEAM));
+            strcpy(table[*pnum_teams]->name, allgames[gamesCount]->name1);           /////bug here!  ////////////////////////////// bug here!///////////////////////////////////////////////////////////////
+            ++*pnum_teams;
+        }
+        puts(allgames[gamesCount]->name2);
+        puts(table[*pnum_teams-1]->name);
+        // finds second name in allgames array is already exists in table
+        nameExist = findIfNameExist (*table, allgames[gamesCount]->name2, *pnum_teams);
+        if (nameExist != 0)
+        {
+            *table = (TEAM*)realloc(*table, *pnum_teams + 1 * sizeof(TEAM));
+            strcpy(table[*pnum_teams]->name, allgames[gamesCount]->name2);             ////bug here!  /////////////////////////////// bug here! /////////////////////////////////////////////////////////////
+            ++*pnum_teams;
+        }
+
+    }
+
+    return *table;
+}
+
+TEAM* addGameLists(TEAM **table, int num_teams, GAME **allgames, int num_games)
+{
+    // declaring on array of game lists, each list for each team.
+    GAME_LIST GameList[num_teams];
+
+    for (int teamsCount = 0; teamsCount < num_teams; ++teamsCount)
+    {
+        int gamesPlayed = 0;
+        GameList[teamsCount].head = (GAME_NODE*)malloc(sizeof(GAME_NODE));
+        table[teamsCount]->games = GameList[teamsCount];
+
+        if (teamsCount == 0)
+        {
+            GameList[teamsCount].tail = GameList[teamsCount].head;
+        }
+
+        for (int gamesCount = 0; gamesCount < num_games; ++gamesCount) {
+            if (*allgames[gamesCount]->name1 == *table[teamsCount]->name)
+            {
+                GameList[teamsCount].tail->next = (GAME_NODE*)malloc(sizeof(GAME_NODE));
+
+                GameList[teamsCount].tail->next->agame = *allgames[gamesCount];
+                GameList[teamsCount].tail = GameList[teamsCount].tail->next;
+                ++gamesPlayed;
+
+            }
+            else if (*allgames[gamesCount]->name2 == *table[teamsCount]->name)
+            {
+                if(teamsCount != 0)
+                    GameList[teamsCount].tail->next = (GAME_NODE*)malloc(sizeof(GAME_NODE));
+
+                GameList[teamsCount].tail->next->agame = *allgames[gamesCount];
+                GameList[teamsCount].tail = GameList[teamsCount].tail->next;
+                ++gamesPlayed;
+            }
+        }
+        table[teamsCount]->games_played = gamesPlayed;     // fill type games played for each team
+    }
+    return *table;
+}
+
+TEAM* fillRestOfTableTypes(TEAM **table, int num_teams)
+{
+    int home, out;  //scores
+    int gamesPlayedByTeam;
+
+    for (int teamsCount = 0; teamsCount < num_teams; ++teamsCount)
+    {
+        gamesPlayedByTeam =  table[teamsCount]->games_played;
+        table[teamsCount]->wins = 0;
+        table[teamsCount]->losses = 0;
+        table[teamsCount]->draws = 0;
+
+        for (int gamesCount = 0; gamesCount < gamesPlayedByTeam; ++gamesCount)
+        {
+
+            table[teamsCount]->games.tail = table[teamsCount]->games.head;
+
+            if (strcmp(table[teamsCount]->games.tail->agame.name1, table[teamsCount]->name) != 0)
+            {
+                home = table[teamsCount]->games.tail->agame.goals1;
+                out = table[teamsCount]->games.tail->agame.goals2;
+                printf("\n%d", table[teamsCount]->games.tail->agame.goals1);
+            }else{
+                home = table[teamsCount]->games.tail->agame.goals2;
+                out = table[teamsCount]->games.tail->agame.goals1;
+            }
+
+            // filling table //
+
+            if (home < out)
+                ++(table[teamsCount]->losses);
+
+            else if (home > out)
+                ++(table[teamsCount]->wins);
+
+            else
+                ++(table[teamsCount]->draws);
+        }
+        table[teamsCount]->games.tail = table[teamsCount]->games.tail->next;
+    }
+    return *table;
+}
