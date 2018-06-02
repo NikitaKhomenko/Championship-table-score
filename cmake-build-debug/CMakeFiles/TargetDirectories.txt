@@ -1,3 +1,3 @@
-/home/nikita/CLionProjects/Chempionship-table-score/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/nikita/CLionProjects/Chempionship-table-score/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/nikita/CLionProjects/Chempionship-table-score/cmake-build-debug/CMakeFiles/Soccer.dir
+/home/nikita/CLionProjects/Soccer/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/nikita/CLionProjects/Soccer/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/nikita/CLionProjects/Soccer/cmake-build-debug/CMakeFiles/Soccer.dir

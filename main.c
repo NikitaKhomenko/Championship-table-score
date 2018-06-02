@@ -33,6 +33,8 @@ GAME* ReadGames(int *pngames);
 TEAM* FillTable(int *pnum_teams, GAME all_games[], int num_games);
 TEAM* PrepareTable(int* tsize, GAME allgames[], int num_games);
 void  PrintTable(TEAM table[], int num_teams);
+void  FreeAllGames(GAME all_games[], int num_games);
+void  FreeAllTeams(TEAM table[], int num_teams);
 
 GAME ReadGame();
 int findIfNameExist (TEAM all_teams[], const char* name, int size);
@@ -54,12 +56,12 @@ void main()
 
 
     PrintTable(table, num_teams);
-//    FreeAllGames(all_games, num_games);
-//    FreeAllTeams(table, num_teams);
+    FreeAllGames(all_games, num_games);
+    FreeAllTeams(table, num_teams);
 
 }
 
-    ////////////////////////////// ********* functions assigned to structs ********* //////////////////////////////
+////////////////////////////// ********* functions assigned to structs ********* //////////////////////////////
 
 GAME* ReadGames(int *pngames)
 {
@@ -133,7 +135,12 @@ TEAM* PrepareTable(int* tsize, GAME allgames[], int num_games)
 
 void  PrintTable(TEAM table[], int num_teams)
 {
+    GAME_NODE *currentNode=0;
+    int gamesPlayedByTeam;
+
     for (int teamCount = 0; teamCount < num_teams; ++teamCount) {
+        gamesPlayedByTeam = table[teamCount].games_played;
+
         printf("\n\n\nTeam Name: %s\n",table[teamCount].name);
         printf("Games Played: %d \t", table[teamCount].games_played);
         printf("Wins: %d \t", table[teamCount].wins);
@@ -141,15 +148,36 @@ void  PrintTable(TEAM table[], int num_teams)
         printf("Draws: %d \t", table[teamCount].draws);
 
         printf("\n\nGames List:\n");
+        currentNode = table[teamCount].games;
 
+        for (int gamesCount = 0; gamesCount < gamesPlayedByTeam; ++gamesCount)
+        {
+            printf("\nGame %d:\n", gamesCount+1);
+            printf("Home: %s", currentNode->agame.name1);
+            printf(" Score: %d", currentNode->agame.goals1);
+            printf("\nAway: %s", currentNode->agame.name2);
+            printf(" Score: %d\n", currentNode->agame.goals2);
+
+
+
+            currentNode = currentNode->next;
+        }
 
     }
 }
 
+void  FreeAllGames(GAME all_games[], int num_games)
+{
+
+}
+
+void  FreeAllTeams(TEAM table[], int num_teams)
+{
+
+}
 
 
-
-    ////////////////////////////// ********* assistance functions ********* //////////////////////////////
+////////////////////////////// ********* assistance functions ********* //////////////////////////////
 
 GAME ReadGame()
 {
@@ -176,7 +204,7 @@ int findIfNameExist (TEAM all_teams[], const char *name, int size)
         if(strcmp(all_teams[i].name, name) == 0)
             exist = 1;
     }
-        return exist;
+    return exist;
 }
 
 
@@ -191,7 +219,7 @@ void addGameLists(TEAM *table, int num_teams, GAME *allgames, int num_games)
         for (int gamesCount = 0; gamesCount < num_games; ++gamesCount)
         {
             if (strcmp(allgames[gamesCount].name1, table[teamsCount].name) == 0
-                    || strcmp(allgames[gamesCount].name2, table[teamsCount].name) == 0)
+                || strcmp(allgames[gamesCount].name2, table[teamsCount].name) == 0)
             {
                 newNode = (GAME_NODE*)malloc(sizeof(GAME_NODE));
                 newNode->agame = allgames[gamesCount];
@@ -249,6 +277,6 @@ void fillRestOfTableTypes(TEAM *table, int num_teams)
                 ++(table[teamsCount].draws);
 
             currentNode = currentNode->next;
-       }
+        }
     }
 }

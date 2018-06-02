@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/nikita/CLionProjects/Chempionship-table-score/main.c
+/home/nikita/CLionProjects/Soccer/main.c
 stdio.h
 -
 string.h
