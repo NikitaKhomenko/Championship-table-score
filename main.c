@@ -33,8 +33,8 @@ GAME* ReadGames(int *pngames);
 TEAM* FillTable(int *pnum_teams, GAME all_games[], int num_games);
 TEAM* PrepareTable(int* tsize, GAME allgames[], int num_games);
 void  PrintTable(TEAM table[], int num_teams);
-void  FreeAllGames(GAME all_games[], int num_games);
-void  FreeAllTeams(TEAM table[], int num_teams);
+void  FreeAllGames(GAME *all_games);
+void  FreeAllTeams(TEAM *table, int num_teams);
 
 GAME ReadGame();
 int findIfNameExist (TEAM all_teams[], const char* name, int size);
@@ -52,11 +52,8 @@ void main()
     all_games = ReadGames(&num_games);
     table  = FillTable(&num_teams, all_games, num_games);
 
-
-
-
     PrintTable(table, num_teams);
-    FreeAllGames(all_games, num_games);
+    FreeAllGames(all_games);
     FreeAllTeams(table, num_teams);
 
 }
@@ -158,22 +155,35 @@ void  PrintTable(TEAM table[], int num_teams)
             printf("\nAway: %s", currentNode->agame.name2);
             printf(" Score: %d\n", currentNode->agame.goals2);
 
-
-
             currentNode = currentNode->next;
         }
 
     }
 }
 
-void  FreeAllGames(GAME all_games[], int num_games)
+void  FreeAllGames(GAME *all_games)
 {
-
+    free(all_games);
 }
 
-void  FreeAllTeams(TEAM table[], int num_teams)
+void  FreeAllTeams(TEAM *table, int num_teams)
 {
+    GAME_NODE *currentNode=0, *tmp = 0;
+    int gamesPlayedByTeam;
 
+    for (int teamCount = 0; teamCount < num_teams; ++teamCount)
+    {
+        gamesPlayedByTeam = table[teamCount].games_played;
+        currentNode = table[teamCount].games;
+
+        for (int gamesCount = 0; gamesCount < gamesPlayedByTeam; ++gamesCount)
+        {
+            tmp = currentNode;
+            currentNode = currentNode->next;
+            free(tmp);
+        }
+    }
+    free(table);
 }
 
 
